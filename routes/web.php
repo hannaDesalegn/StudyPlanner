@@ -12,7 +12,13 @@ $protectedPages = [
     'dashboard',
     'tasks',
     'calendar',
-    'profile'
+    'profile',
+    'update-profile',
+    'store-task',
+    'delete-task',
+    'edit-task',
+    'update-task',
+    'logout'
 ];
 
 if(in_array($page, $protectedPages) && !isset($_SESSION['user_id']))
@@ -57,7 +63,9 @@ switch($page)
     case 'profile':
         require_once "../app/views/profile.php";
         break;
-
+    case 'update-profile':
+        $auth->updateProfile();
+        break;
     case 'store-register':
         $auth->storeRegister();
         break;
@@ -71,6 +79,7 @@ switch($page)
         break;
 
     default:
-        require_once "../app/views/landing.php";
-        break;
+    http_response_code(404);
+    require_once "../app/views/404.php";
+    exit();
 }

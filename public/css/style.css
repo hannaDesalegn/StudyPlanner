@@ -1054,15 +1054,22 @@ body.dark-mode textarea::placeholder {
 .profile-edit-btn { position: absolute; top: 1rem; right: 1rem; }
 
 .profile-avatar {
-  width: 64px; height: 64px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  display: grid;
-  place-items: center;
-  font-size: 1.8rem;
-  color: #000;
-  flex-shrink: 0;
-  box-shadow: 0 0 24px rgba(245,158,11,0.3);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }
 .profile-summary-copy { flex: 1; }
 .profile-summary-copy h2 {

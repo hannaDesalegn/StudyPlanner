@@ -1,8 +1,4 @@
-/* =============================
-   Study Planner — script.js
-============================= */
-
-// ── Theme ──────────────────────────────────────────
+// Theme
 const THEME_KEY = 'sp_theme';
 function applyTheme(dark) {
   document.body.classList.toggle('dark-mode', dark);
@@ -19,7 +15,7 @@ document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
   });
 });
 
-// ── Sidebar toggle ─────────────────────────────────
+// Sidebar toggle 
 document.querySelectorAll('[data-sidebar-toggle]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.body.classList.toggle('sidebar-open');
@@ -36,7 +32,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// ── Toast Notifications ────────────────────────────
+//  Toast Notifications 
 function showToast(message, type = 'info', duration = 3500) {
   let container = document.querySelector('.toast-container');
   if (!container) {
@@ -56,7 +52,7 @@ function showToast(message, type = 'info', duration = 3500) {
 }
 window.showToast = showToast;
 
-// ── Auth panel toggle ──────────────────────────────
+// Auth panel toggle 
 const loginPanel  = document.querySelector('[data-login-panel]');
 const signupPanel = document.querySelector('[data-signup-panel]');
 
@@ -88,7 +84,7 @@ if (authInputs.length) {
   });
 }
 
-// ── Password visibility toggle ─────────────────────
+// Password visibility toggle 
 document.querySelectorAll('.password-toggle').forEach(button => {
 
   button.addEventListener('click', () => {
@@ -114,7 +110,7 @@ document.querySelectorAll('.password-toggle').forEach(button => {
   });
 
 });
-// ── Profile modal ──────────────────────────────────
+// Profile modal 
 const profileModal = document.querySelector('[data-profile-edit-panel]');
 const profileInitials = document.querySelector('[data-profile-initials]');
 
@@ -146,24 +142,25 @@ document.querySelectorAll('[data-profile-edit-toggle]').forEach(btn => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProfile(); });
 
-// Profile save (frontend only)
-document.querySelector('[data-profile-save]')?.addEventListener('click', () => {
-  const name  = document.querySelector('#profile-name')?.value;
-  const email = document.querySelector('#profile-email')?.value;
-  if (name) {
-    document.querySelectorAll('[data-profile-name-display]').forEach(el => el.textContent = name);
-    if (profileInitials) {
-      profileInitials.textContent = getInitials(name);
-    }
-  }
-  if (email) {
-    document.querySelectorAll('[data-profile-email-display]').forEach(el => el.textContent = email);
-  }
-  closeProfile();
-  showToast('Profile updated successfully', 'success');
+// Profile image live preview 
+document.getElementById('profile-image')?.addEventListener('change', function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const avatar = document.querySelector('.profile-avatar');
+    if (!avatar) return;
+
+    // Replace initials span with preview image
+    avatar.innerHTML = `<img src="${e.target.result}" 
+      alt="Profile preview"
+      style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;">`;
+  };
+  reader.readAsDataURL(file);
 });
 
-// ── Task search/filter ─────────────────────────────
+//Task search/filter
 const taskSearch = document.getElementById('taskSearch');
 const taskFilter = document.getElementById('taskFilter');
 
@@ -179,7 +176,7 @@ function filterTasks() {
 taskSearch?.addEventListener('input', filterTasks);
 taskFilter?.addEventListener('change', filterTasks);
 
-// ── Calendar week/month toggle ─────────────────────
+// Calendar week/month toggle 
 document.querySelectorAll('.calendar-switcher .pill-btn').forEach(btn => {
   btn.addEventListener('click', function () {
     this.closest('.calendar-switcher').querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
@@ -187,7 +184,7 @@ document.querySelectorAll('.calendar-switcher .pill-btn').forEach(btn => {
   });
 });
 
-// ── Animate stat counters ──────────────────────────
+// Animate stat counters
 function animateCounter(el) {
   const target = parseFloat(el.textContent.replace(/[^0-9.]/g, ''));
   const suffix = el.textContent.replace(/[0-9.]/g, '');
@@ -214,14 +211,14 @@ const observer = new IntersectionObserver(entries => {
 }, { threshold: 0.3 });
 document.querySelectorAll('.stats-grid').forEach(el => observer.observe(el));
 
-// ── Progress bar animation ─────────────────────────
+// Progress bar animation 
 document.querySelectorAll('.progress-bar span').forEach(bar => {
   const target = bar.style.width;
   bar.style.width = '0';
   setTimeout(() => { bar.style.width = target; }, 300);
 });
 
-// ── Pomodoro Timer ─────────────────────────────────
+//Pomodoro Timer 
 (function () {
   const ring      = document.querySelector('.pomo-ring-fill');
   const display   = document.querySelector('.pomo-ring-text');
@@ -292,8 +289,6 @@ document.querySelectorAll('.progress-bar span').forEach(bar => {
 })();
 
 // ── Keyboard shortcuts ─────────────────────────────
-// ── Keyboard shortcuts ─────────────────────────────
-// ── Keyboard shortcuts ─────────────────────────────
 document.addEventListener('keydown', e => {
 
   // Ignore shortcuts while typing
@@ -340,7 +335,7 @@ document.addEventListener('keydown', e => {
 
 });
 
-// ── Mobile swipe to close sidebar ─────────────────
+// Mobile swipe to close sidebar 
 let touchStart = 0;
 document.addEventListener('touchstart', e => { touchStart = e.touches[0].clientX; });
 document.addEventListener('touchend', e => {
@@ -348,7 +343,7 @@ document.addEventListener('touchend', e => {
   if (diff > 60) document.body.classList.remove('sidebar-open');
   if (diff < -60 && touchStart < 40) document.body.classList.add('sidebar-open');
 });
-// ── Auto focus task input after redirect ──────────
+// Auto focus task input after redirect 
 window.addEventListener('load', () => {
 
   const params = new URLSearchParams(window.location.search);
