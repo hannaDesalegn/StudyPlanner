@@ -1,0 +1,310 @@
+/* =============================
+   Study Planner — script.js
+============================= */
+
+// ── Theme ──────────────────────────────────────────
+const THEME_KEY = 'sp_theme';
+function applyTheme(dark) {
+  document.body.classList.toggle('dark-mode', dark);
+  localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+}
+(function () {
+  const saved = localStorage.getItem(THEME_KEY);
+  document.body.classList.toggle('dark-mode', saved === 'dark');
+})();
+
+document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    applyTheme(!document.body.classList.contains('dark-mode'));
+  });
+});
+
+// ── Sidebar toggle ─────────────────────────────────
+document.querySelectorAll('[data-sidebar-toggle]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.body.classList.toggle('sidebar-open');
+  });
+});
+// Close sidebar when clicking outside
+document.addEventListener('click', e => {
+  if (
+    document.body.classList.contains('sidebar-open') &&
+    !e.target.closest('.sidebar') &&
+    !e.target.closest('[data-sidebar-toggle]')
+  ) {
+    document.body.classList.remove('sidebar-open');
+  }
+});
+
+// ── Toast Notifications ────────────────────────────
+function showToast(message, type = 'info', duration = 3500) {
+  let container = document.querySelector('.toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('removing');
+    toast.addEventListener('animationend', () => toast.remove(), { once: true });
+  }, duration);
+}
+window.showToast = showToast;
+
+// ── Auth panel toggle ──────────────────────────────
+const loginPanel  = document.querySelector('[data-login-panel]');
+const signupPanel = document.querySelector('[data-signup-panel]');
+
+function showSignup() {
+  if (!loginPanel || !signupPanel) return;
+  loginPanel.classList.remove('is-active');
+  signupPanel.classList.add('is-visible', 'is-active');
+}
+function showLogin() {
+  if (!loginPanel || !signupPanel) return;
+  signupPanel.classList.remove('is-visible', 'is-active');
+  loginPanel.classList.add('is-active');
+}
+
+document.querySelectorAll('[data-signup-toggle]').forEach(b => b.addEventListener('click', showSignup));
+document.querySelectorAll('[data-signup-close]').forEach(b => b.addEventListener('click', showLogin));
+
+// Clear inline field errors when the user starts editing a field
+const authInputs = document.querySelectorAll('[data-login-panel] input, [data-signup-panel] input');
+
+const clearFieldErrors = () => {
+  document.querySelectorAll('.field-error').forEach(el => el.remove());
+};
+
+if (authInputs.length) {
+  authInputs.forEach(input => {
+    input.addEventListener('input', clearFieldErrors, { once: true });
+    input.addEventListener('change', clearFieldErrors, { once: true });
+  });
+}
+
+// ── Password visibility toggle ─────────────────────
+document.querySelectorAll('.password-toggle').forEach(button => {
+
+  button.addEventListener('click', () => {
+
+    const input = button.previousElementSibling;
+    const icon = button.querySelector('i');
+
+    if (input.type === 'password')
+    {
+      input.type = 'text';
+
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    }
+    else
+    {
+      input.type = 'password';
+
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+
+  });
+
+});
+// ── Profile modal ──────────────────────────────────
+const profileModal = document.querySelector('[data-profile-edit-panel]');
+const profileInitials = document.querySelector('[data-profile-initials]');
+
+function getInitials(name) {
+  return (name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0].toUpperCase())
+    .join('') || 'YP';
+}
+
+function openProfile() {
+  if (!profileModal) return;
+  profileModal.removeAttribute('hidden');
+  requestAnimationFrame(() => profileModal.classList.add('is-visible'));
+}
+function closeProfile() {
+  if (!profileModal) return;
+  profileModal.classList.remove('is-visible');
+  setTimeout(() => profileModal.setAttribute('hidden', ''), 200);
+}
+
+document.querySelectorAll('[data-profile-edit-toggle]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    profileModal && profileModal.hasAttribute('hidden') ? openProfile() : closeProfile();
+  });
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProfile(); });
+
+// Profile save (frontend only)
+document.querySelector('[data-profile-save]')?.addEventListener('click', () => {
+  const name  = document.querySelector('#profile-name')?.value;
+  const email = document.querySelector('#profile-email')?.value;
+  if (name) {
+    document.querySelectorAll('[data-profile-name-display]').forEach(el => el.textContent = name);
+    if (profileInitials) {
+      profileInitials.textContent = getInitials(name);
+    }
+  }
+  if (email) {
+    document.querySelectorAll('[data-profile-email-display]').forEach(el => el.textContent = email);
+  }
+  closeProfile();
+  showToast('Profile updated successfully', 'success');
+});
+
+// ── Task search/filter ─────────────────────────────
+const taskSearch = document.getElementById('taskSearch');
+const taskFilter = document.getElementById('taskFilter');
+
+function filterTasks() {
+  const q = taskSearch?.value.toLowerCase() || '';
+  const p = taskFilter?.value || 'all';
+  document.querySelectorAll('.task-card[data-priority]').forEach(card => {
+    const titleMatch = (card.dataset.title || '').includes(q);
+    const prioMatch  = p === 'all' || card.dataset.priority === p;
+    card.style.display = (titleMatch && prioMatch) ? '' : 'none';
+  });
+}
+taskSearch?.addEventListener('input', filterTasks);
+taskFilter?.addEventListener('change', filterTasks);
+
+// ── Calendar week/month toggle ─────────────────────
+document.querySelectorAll('.calendar-switcher .pill-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    this.closest('.calendar-switcher').querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// ── Animate stat counters ──────────────────────────
+function animateCounter(el) {
+  const target = parseFloat(el.textContent.replace(/[^0-9.]/g, ''));
+  const suffix = el.textContent.replace(/[0-9.]/g, '');
+  if (isNaN(target)) return;
+  let start = 0;
+  const dur = 900;
+  const step = timestamp => {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = (target < 10 ? String(Math.floor(ease * target)).padStart(2, '0') : Math.floor(ease * target)) + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.stat-card h3').forEach(animateCounter);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.stats-grid').forEach(el => observer.observe(el));
+
+// ── Progress bar animation ─────────────────────────
+document.querySelectorAll('.progress-bar span').forEach(bar => {
+  const target = bar.style.width;
+  bar.style.width = '0';
+  setTimeout(() => { bar.style.width = target; }, 300);
+});
+
+// ── Pomodoro Timer ─────────────────────────────────
+(function () {
+  const ring      = document.querySelector('.pomo-ring-fill');
+  const display   = document.querySelector('.pomo-ring-text');
+  const startBtn  = document.querySelector('[data-pomo-start]');
+  const resetBtn  = document.querySelector('[data-pomo-reset]');
+  const modebtns  = document.querySelectorAll('[data-pomo-mode]');
+  if (!ring || !display) return;
+
+  const MODES = { focus: 25 * 60, short: 5 * 60, long: 15 * 60 };
+  let current = MODES.focus;
+  let total   = MODES.focus;
+  let timer   = null;
+  let running = false;
+
+  const CIRC = 283; // 2π × 45
+
+  function fmt(s) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
+  function updateRing() {
+    const pct = current / total;
+    ring.style.strokeDashoffset = CIRC * (1 - pct);
+    display.textContent = fmt(current);
+  }
+  function stop() {
+    clearInterval(timer);
+    running = false;
+    startBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+    startBtn.classList.remove('active');
+  }
+
+  startBtn?.addEventListener('click', () => {
+    if (running) { stop(); return; }
+    running = true;
+    startBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+    startBtn.classList.add('active');
+    timer = setInterval(() => {
+      current--;
+      updateRing();
+      if (current <= 0) {
+        stop();
+        showToast('Pomodoro complete! Take a break.', 'success');
+        current = total;
+        updateRing();
+      }
+    }, 1000);
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    stop();
+    current = total;
+    updateRing();
+  });
+
+  modebtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+      modebtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      stop();
+      total = current = MODES[this.dataset.pomoMode] || MODES.focus;
+      updateRing();
+    });
+  });
+
+  updateRing();
+})();
+
+// ── Keyboard shortcuts ─────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'n' || e.key === 'N') {
+    const taskInput = document.getElementById('task-title');
+    if (taskInput) { taskInput.focus(); showToast('New task focused', 'info', 2000); }
+  }
+});
+
+// ── Mobile swipe to close sidebar ─────────────────
+let touchStart = 0;
+document.addEventListener('touchstart', e => { touchStart = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStart - e.changedTouches[0].clientX;
+  if (diff > 60) document.body.classList.remove('sidebar-open');
+  if (diff < -60 && touchStart < 40) document.body.classList.add('sidebar-open');
+});
