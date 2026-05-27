@@ -292,12 +292,52 @@ document.querySelectorAll('.progress-bar span').forEach(bar => {
 })();
 
 // ── Keyboard shortcuts ─────────────────────────────
+// ── Keyboard shortcuts ─────────────────────────────
+// ── Keyboard shortcuts ─────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-  if (e.key === 'n' || e.key === 'N') {
-    const taskInput = document.getElementById('task-title');
-    if (taskInput) { taskInput.focus(); showToast('New task focused', 'info', 2000); }
+
+  // Ignore shortcuts while typing
+  if (
+    e.target.tagName === 'INPUT' ||
+    e.target.tagName === 'TEXTAREA' ||
+    e.target.tagName === 'SELECT'
+  ) {
+    return;
   }
+
+  // Press N to create new task
+  if (e.key === 'n' || e.key === 'N') {
+
+    e.preventDefault();
+
+    const taskInput = document.getElementById('task-title');
+
+    // If already on tasks page
+    if (taskInput) {
+
+      taskInput.focus();
+
+      taskInput.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+      showToast(
+        'Ready to add a new task',
+        'info',
+        2000
+      );
+
+    } else {
+
+      // Redirect and tell tasks page to autofocus
+      window.location.href =
+        'index.php?page=tasks&focusTask=1';
+
+    }
+
+  }
+
 });
 
 // ── Mobile swipe to close sidebar ─────────────────
@@ -307,4 +347,33 @@ document.addEventListener('touchend', e => {
   const diff = touchStart - e.changedTouches[0].clientX;
   if (diff > 60) document.body.classList.remove('sidebar-open');
   if (diff < -60 && touchStart < 40) document.body.classList.add('sidebar-open');
+});
+// ── Auto focus task input after redirect ──────────
+window.addEventListener('load', () => {
+
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get('focusTask') === '1') {
+
+    const taskInput = document.getElementById('task-title');
+
+    if (taskInput) {
+
+      taskInput.focus();
+
+      taskInput.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+      showToast(
+        'Ready to add a new task',
+        'info',
+        2000
+      );
+
+    }
+
+  }
+
 });

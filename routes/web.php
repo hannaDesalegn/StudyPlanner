@@ -32,8 +32,23 @@ switch($page)
         break;
 
     case 'tasks':
-        $task->index();
-        break;
+    $task->index();
+    break;
+
+    case 'store-task':
+    $task->store();
+    break;
+
+    case 'delete-task':
+    $task->delete();
+    break;
+    case 'edit-task':
+    $task->edit();
+    break;
+
+    case 'update-task':
+    $task->update();
+    break;
 
     case 'calendar':
         require_once "../app/views/calendar.php";

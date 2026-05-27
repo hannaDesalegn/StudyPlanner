@@ -528,7 +528,7 @@ body.dark-mode .sidebar {
   border-radius: var(--r);
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.88);
-  color: var(--text);
+  color: #0b0e12;
   font-size: 0.9rem;
   outline: none;
   transition: border-color var(--t), box-shadow var(--t), background var(--t);
@@ -546,6 +546,45 @@ body.dark-mode .sidebar {
 }
 .form-group select option { background: #fff; }
 
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea {
+  background: #ffffff;
+  border-color: rgba(48,54,61,0.9);
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000;
+}
+body.dark-mode .form-group input::placeholder,
+body.dark-mode .form-group textarea::placeholder {
+  color: #6b7280;
+}
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus {
+  border-color: rgba(242,196,110,0.45);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(242,196,110,0.18);
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000;
+}
+
+body.dark-mode .task-form input,
+body.dark-mode .task-form select,
+body.dark-mode .task-form textarea {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #6b7280;
+}
+
 .form-message {
   padding: 0.7rem 0.9rem;
   border-radius: var(--r-sm);
@@ -553,7 +592,6 @@ body.dark-mode .sidebar {
   font-weight: 500;
   margin-bottom: 0.85rem;
 }
-.form-message.error   { background: var(--red-dim);   color: var(--red);   border: 1px solid rgba(244,63,94,0.25); }
 .form-message.success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
 
 /* Inline field error shown under inputs */

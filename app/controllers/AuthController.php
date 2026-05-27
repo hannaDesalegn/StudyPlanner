@@ -1,24 +1,33 @@
 <?php
 
-require_once "../config/db.php";
+require_once "../app/models/User.php";
 
 class AuthController
 {
+    private $userModel;
+
+    public function __construct()
+    {
+        $this->userModel = new User();
+    }
+
     public function storeRegister()
     {
-        global $pdo;
-
         $username = trim($_POST['full_name']);
         $email = trim($_POST['email']);
         $plainPassword = $_POST['password'];
-        // Validation (collect field-level errors)
+
+        // Validation
         $errors = [];
+
         if (empty($username)) {
             $errors['full_name'] = 'Full name is required.';
         }
+
         if (empty($email)) {
             $errors['email'] = 'Email is required.';
         }
+
         if (empty($plainPassword)) {
             $errors['password'] = 'Password is required.';
         }
@@ -27,36 +36,27 @@ class AuthController
             $errors['password'] = 'Password must be at least 6 characters.';
         }
 
-        // Check duplicate email
-        if (!isset($errors['email'])) {
-            $check = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-            $check->execute([$email]);
-            if ($check->fetch()) {
-                $errors['email'] = 'Email already exists.';
-            }
+        // Duplicate email check
+        $existingUser = $this->userModel->findByEmail($email);
+
+        if ($existingUser) {
+            $errors['email'] = 'Email already exists.';
         }
 
+        // Redirect back if errors
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['form'] = 'signup';
+
             header("Location: index.php");
             exit();
         }
 
-        $password = password_hash($plainPassword, PASSWORD_DEFAULT);
+        // Create user
+        $this->userModel->createUser($username, $email, $plainPassword);
 
-        $stmt = $pdo->prepare(
-            "INSERT INTO users(username, email, password)
-             VALUES(?, ?, ?)"
-        );
-
-        $stmt->execute([
-            $username,
-            $email,
-            $password
-        ]);
-
-        $_SESSION['user_id'] = $pdo->lastInsertId();
+        // Session
+        $_SESSION['user_id'] = $this->userModel->getLastInsertedId();
         $_SESSION['username'] = $username;
         $_SESSION['email'] = $email;
 
@@ -68,36 +68,34 @@ class AuthController
 
     public function authenticate()
     {
-        global $pdo;
-
         $email = trim($_POST['email']);
         $password = $_POST['password'];
 
-        // Validation 
+        // Validation
         $errors = [];
+
         if (empty($email)) {
             $errors['email'] = 'Email is required.';
         }
+
         if (empty($password)) {
             $errors['password'] = 'Password is required.';
         }
 
+        // Redirect back if errors
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['form'] = 'login';
+
             header("Location: index.php");
             exit();
         }
 
-        $stmt = $pdo->prepare(
-            "SELECT * FROM users WHERE email = ?"
-        );
+        // Find user
+        $user = $this->userModel->findByEmail($email);
 
-        $stmt->execute([$email]);
-
-        $user = $stmt->fetch();
-
-        if($user && password_verify($password, $user['password']))
+        // Verify password
+        if ($user && password_verify($password, $user['password']))
         {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
@@ -107,9 +105,15 @@ class AuthController
 
             header("Location: index.php?page=dashboard");
             exit();
-        } else {
-            $_SESSION['errors'] = ['email' => 'Invalid email or password.'];
+        }
+        else
+        {
+            $_SESSION['errors'] = [
+                'email' => 'Invalid email or password.'
+            ];
+
             $_SESSION['form'] = 'login';
+
             header("Location: index.php");
             exit();
         }
