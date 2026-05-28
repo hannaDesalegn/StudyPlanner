@@ -214,4 +214,36 @@ $_SESSION['success'] = "Profile updated successfully!";
 header("Location: index.php?page=profile");
 exit();
 }
+// SAVE FOCUS SESSION
+public function saveFocusSession()
+{
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode([
+            'success' => false
+        ]);
+
+        exit();
+    }
+
+    $minutes = (int) ($_POST['minutes'] ?? 0);
+
+    if ($minutes <= 0) {
+        echo json_encode([
+            'success' => false
+        ]);
+
+        exit();
+    }
+
+    $this->userModel->saveFocusSession(
+        $_SESSION['user_id'],
+        $minutes
+    );
+
+    echo json_encode([
+        'success' => true
+    ]);
+
+    exit();
+}
 }
