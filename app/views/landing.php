@@ -20,7 +20,8 @@ include('../public/includes/header.php');
 
         <div class="form-group">
           <label for="login-email">Email address</label>
-          <input id="login-email" name="email" type="email" placeholder="you@example.com" required autocomplete="email">
+          <input id="login-email" name="email"type="email"placeholder="you@gmail.com"required autocomplete="email"value="<?php echo $_COOKIE['remember_email'] ?? ''; ?>"
+>
           <?php if($formToShow === 'login' && isset($_SESSION['errors']['email'])): ?>
             <p class="field-error"><?php echo $_SESSION['errors']['email']; ?></p>
           <?php endif; ?>
@@ -44,12 +45,21 @@ include('../public/includes/header.php');
             <p class="field-error"><?php echo $_SESSION['errors']['password']; ?></p>
           <?php endif; ?>
         </div>
+        
+<div class="remember-me">
+    <input
+        type="checkbox"
+        id="remember"
+        name="remember"
+    >
+    <label for="remember">Remember Me</label>
+</div>
         <button class="primary-btn full-btn" type="submit" style="margin-bottom:0.75rem;">
           <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in
         </button>
         <p class="inline-link-row">
           No account?
-          <button class="link-btn" type="button" data-signup-toggle>Create one free</button>
+          <button class="link-btn" type="button" data-signup-toggle>Create one </button>
         </p>
       </form>
 

@@ -109,10 +109,30 @@ class AuthController
         $_SESSION['profile_image'] = $updatedUser['profile_image'];
 
         $_SESSION['success'] =
-            "Welcome back " . $updatedUser['username'] . "!";
+    "Welcome back " . $updatedUser['username'] . "!";
 
-        header("Location: index.php?page=dashboard");
-        exit();
+/* Remember Me Cookie */
+if (isset($_POST['remember'])) {
+
+    setcookie(
+        'remember_email',
+        $email,
+        time() + (30 * 24 * 60 * 60),
+        '/'
+    );
+
+} else {
+
+    setcookie(
+        'remember_email',
+        '',
+        time() - 3600,
+        '/'
+    );
+}
+
+header("Location: index.php?page=dashboard");
+exit();
     }
     else
     {
