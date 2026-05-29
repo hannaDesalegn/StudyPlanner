@@ -1,5 +1,5 @@
 <?php
-$pageTitle  = $pageTitle  ?? 'Study Planner';
+$pageTitle  = $pageTitle  ?? 'Hyidy - Your Study Companion';
 $bodyClass  = $bodyClass  ?? '';
 $activePage = $activePage ?? 'landing';
 $showSidebar = $showSidebar ?? false;
@@ -9,8 +9,8 @@ $showSidebar = $showSidebar ?? false;
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Study Planner — focus, track, achieve.">
-  <title><?php echo htmlspecialchars($pageTitle); ?> · Study Planner</title>
+  <meta name="description" content="Hyidy — focus, track, achieve.">
+  <title><?php echo htmlspecialchars($pageTitle); ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
@@ -25,8 +25,8 @@ $showSidebar = $showSidebar ?? false;
   <header class="topbar">
     <div class="brand">
       <a href="index.php?page=dashboard" style="display:flex;align-items:center;gap:0.85rem;">
-        <span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>
-        <h1>StudyPlanner</h1>
+        <span class="brand-mark"><i class="fa-solid fa-book-open"></i></span>
+        <h1>Hyidy</h1>
       </a>
     </div>
 
@@ -66,15 +66,9 @@ $showSidebar = $showSidebar ?? false;
           </a>
         </nav>
 
-        <p class="nav-section-label" style="margin-top:1rem;">Focus</p>
-        <nav>
-          <a class="nav-link" href="#" onclick="document.querySelector('.pomodoro-widget')?.scrollIntoView({behavior:'smooth'});return false;">
-            <i class="fa-solid fa-clock"></i><span>Pomodoro</span>
-          </a>
-        </nav>
-
+       
         <div class="sidebar-footer" style="margin-top:auto;">
-          <p class="eyebrow">Today</p>
+         
           <strong>Stay consistent</strong>
           <p>Small daily progress compounds into big results.</p>
         </div>

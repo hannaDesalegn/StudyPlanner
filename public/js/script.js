@@ -15,22 +15,7 @@ document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
   });
 });
 
-// Sidebar toggle 
-document.querySelectorAll('[data-sidebar-toggle]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.body.classList.toggle('sidebar-open');
-  });
-});
-// Close sidebar when clicking outside
-document.addEventListener('click', e => {
-  if (
-    document.body.classList.contains('sidebar-open') &&
-    !e.target.closest('.sidebar') &&
-    !e.target.closest('[data-sidebar-toggle]')
-  ) {
-    document.body.classList.remove('sidebar-open');
-  }
-});
+
 
 //  Toast Notifications 
 function showToast(message, type = 'info', duration = 3500) {
@@ -124,16 +109,7 @@ function getInitials(name) {
     .join('') || 'YP';
 }
 
-function openProfile() {
-  if (!profileModal) return;
-  profileModal.removeAttribute('hidden');
-  requestAnimationFrame(() => profileModal.classList.add('is-visible'));
-}
-function closeProfile() {
-  if (!profileModal) return;
-  profileModal.classList.remove('is-visible');
-  setTimeout(() => profileModal.setAttribute('hidden', ''), 200);
-}
+
 
 document.querySelectorAll('[data-profile-edit-toggle]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -167,16 +143,12 @@ const taskFilter = document.getElementById('taskFilter');
 function filterTasks() {
   const q = taskSearch?.value.toLowerCase() || '';
   const p = taskFilter?.value || 'all';
-  document.querySelectorAll('.task-card[data-priority]').forEach(card => {
-    const titleMatch = (card.dataset.title || '').includes(q);
-    const prioMatch  = p === 'all' || card.dataset.priority === p;
-    card.style.display = (titleMatch && prioMatch) ? '' : 'none';
-  });
+  
 }
 taskSearch?.addEventListener('input', filterTasks);
 taskFilter?.addEventListener('change', filterTasks);
 
-// Calendar week/month toggle 
+// aalendar week/month toggle 
 document.querySelectorAll('.calendar-switcher .pill-btn').forEach(btn => {
   btn.addEventListener('click', function () {
     this.closest('.calendar-switcher').querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
@@ -184,7 +156,7 @@ document.querySelectorAll('.calendar-switcher .pill-btn').forEach(btn => {
   });
 });
 
-// Animate stat counters
+// animate stat counters
 function animateCounter(el) {
   const target = parseFloat(el.textContent.replace(/[^0-9.]/g, ''));
   const suffix = el.textContent.replace(/[0-9.]/g, '');
@@ -211,14 +183,14 @@ const observer = new IntersectionObserver(entries => {
 }, { threshold: 0.3 });
 document.querySelectorAll('.stats-grid').forEach(el => observer.observe(el));
 
-// Progress bar animation 
+// progress bar animation 
 document.querySelectorAll('.progress-bar span').forEach(bar => {
   const target = bar.style.width;
   bar.style.width = '0';
   setTimeout(() => { bar.style.width = target; }, 300);
 });
 
-//Pomodoro Timer 
+//pomodoro Timer 
 (function () {
   const ring      = document.querySelector('.pomo-ring-fill');
   const display   = document.querySelector('.pomo-ring-text');
@@ -232,7 +204,7 @@ document.querySelectorAll('.progress-bar span').forEach(bar => {
   let total   = MODES.focus;
   let timer   = null;
   let running = false;
-
+let focusSeconds = parseInt(localStorage.getItem('focusSeconds')) || 0;
   const CIRC = 283; // 2π × 45
 
   function fmt(s) {
@@ -259,7 +231,34 @@ document.querySelectorAll('.progress-bar span').forEach(bar => {
     startBtn.classList.add('active');
     timer = setInterval(() => {
       current--;
-      updateRing();
+
+if (
+  document.querySelector('[data-pomo-mode].active')?.dataset.pomoMode === 'focus'
+) {
+
+  focusSeconds++;
+
+  localStorage.setItem(
+    'focusSeconds',
+    focusSeconds
+  );
+
+  updateFocusGoal();
+
+}
+
+updateRing();
+      function updateFocusGoal() {
+
+  const hours = (focusSeconds / 3600).toFixed(1);
+
+  const goalEl = document.querySelector('[data-focus-goal]');
+
+  if (goalEl) {
+    goalEl.textContent = `${hours} / 6h`;
+  }
+
+}
       if (current <= 0) {
         stop();
         showToast('Pomodoro complete! Take a break.', 'success');
@@ -280,18 +279,20 @@ document.querySelectorAll('.progress-bar span').forEach(bar => {
       modebtns.forEach(b => b.classList.remove('active'));
       this.classList.add('active');
       stop();
-      total = current = MODES[this.dataset.pomoMode] || MODES.focus;
+      total = current =
+  (parseInt(this.dataset.minutes) || 25) * 60;
       updateRing();
     });
   });
 
   updateRing();
+updateFocusGoal();
 })();
 
-// ── Keyboard shortcuts ─────────────────────────────
+//keyboard shortcut
 document.addEventListener('keydown', e => {
 
-  // Ignore shortcuts while typing
+  // ignore shortcuts while typing
   if (
     e.target.tagName === 'INPUT' ||
     e.target.tagName === 'TEXTAREA' ||
@@ -300,14 +301,14 @@ document.addEventListener('keydown', e => {
     return;
   }
 
-  // Press N to create new task
+  // press N to create new task
   if (e.key === 'n' || e.key === 'N') {
 
     e.preventDefault();
 
     const taskInput = document.getElementById('task-title');
 
-    // If already on tasks page
+    // if already on tasks page
     if (taskInput) {
 
       taskInput.focus();
@@ -325,7 +326,7 @@ document.addEventListener('keydown', e => {
 
     } else {
 
-      // Redirect and tell tasks page to autofocus
+      // redirect and tell tasks page to autofocus
       window.location.href =
         'index.php?page=tasks&focusTask=1';
 
@@ -335,7 +336,7 @@ document.addEventListener('keydown', e => {
 
 });
 
-// Mobile swipe to close sidebar 
+// mobile swipe to close sidebar 
 let touchStart = 0;
 document.addEventListener('touchstart', e => { touchStart = e.touches[0].clientX; });
 document.addEventListener('touchend', e => {
@@ -343,7 +344,7 @@ document.addEventListener('touchend', e => {
   if (diff > 60) document.body.classList.remove('sidebar-open');
   if (diff < -60 && touchStart < 40) document.body.classList.add('sidebar-open');
 });
-// Auto focus task input after redirect 
+// auto focus task input after redirect 
 window.addEventListener('load', () => {
 
   const params = new URLSearchParams(window.location.search);

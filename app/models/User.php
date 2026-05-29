@@ -397,37 +397,7 @@ class User
             $user_id
         ]);
     }
-// SAVE FOCUS SESSION
-public function saveFocusSession($user_id, $minutes)
-{
-    // create table automatically if not exists
-    $this->pdo->exec(
-        "CREATE TABLE IF NOT EXISTS focus_sessions (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            minutes INT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-            FOREIGN KEY (user_id)
-            REFERENCES users(id)
-            ON DELETE CASCADE
-        )"
-    );
-
-    $stmt = $this->pdo->prepare(
-        "INSERT INTO focus_sessions
-        (
-            user_id,
-            minutes
-        )
-        VALUES (?, ?)"
-    );
-
-    return $stmt->execute([
-        $user_id,
-        $minutes
-    ]);
-}
 // TODAY FOCUS MINUTES
 public function getTodayFocusMinutes($user_id)
 {
@@ -447,4 +417,55 @@ public function getTodayFocusMinutes($user_id)
 
     return (int) $stmt->fetch()['total'];
 }
+public function updateStudyGoals($user_id, $data)
+{
+    // check if exists
+    $check = $this->pdo->prepare(
+        "SELECT id FROM study_goals WHERE user_id = ?"
+    );
+
+    $check->execute([$user_id]);
+
+    $exists = $check->fetch();
+
+    if ($exists)
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE study_goals
+             SET
+                daily_focus_hours = ?,
+                weekly_tasks_target = ?,
+                target_completion = ?
+             WHERE user_id = ?"
+        );
+
+        return $stmt->execute([
+            $data['daily_focus_hours'],
+            $data['weekly_tasks_target'],
+            $data['target_completion'],
+            $user_id
+        ]);
+    }
+    else
+    {
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO study_goals
+            (
+                user_id,
+                daily_focus_hours,
+                weekly_tasks_target,
+                target_completion
+            )
+            VALUES (?, ?, ?, ?)"
+        );
+
+        return $stmt->execute([
+            $user_id,
+            $data['daily_focus_hours'],
+            $data['weekly_tasks_target'],
+            $data['target_completion']
+        ]);
+    }
+}
+
 }

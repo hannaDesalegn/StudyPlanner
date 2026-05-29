@@ -16,7 +16,11 @@ $upcomingTasks = $userModel->getUpcomingTasks($user_id);
 
 $weeklyProgress = $userModel->getWeeklyProgress($user_id);
 
-$studyGoals = $userModel->getStudyGoals($user_id);
+$studyGoals = $userModel->getStudyGoals($user_id) ?? [
+    'daily_focus_hours' => 4,
+    'weekly_tasks_target' => 14,
+    'target_completion' => 80
+];
 $todayFocusMinutes =
     $userModel->getTodayFocusMinutes($user_id);
 
@@ -293,9 +297,23 @@ include('../public/includes/header.php');
       </div>
 
       <div class="pomo-modes">
-        <button class="pomo-mode-btn active">Focus</button>
-        <button class="pomo-mode-btn">Short break</button>
-        <button class="pomo-mode-btn">Long break</button>
+        <button class="pomo-mode-btn active"
+        data-pomo-mode="focus"
+        data-minutes="25">
+    Focus
+</button>
+
+<button class="pomo-mode-btn"
+        data-pomo-mode="short"
+        data-minutes="5">
+    Short break
+</button>
+
+<button class="pomo-mode-btn"
+        data-pomo-mode="long"
+        data-minutes="15">
+    Long break
+</button>
       </div>
 
       <div class="pomo-ring">
@@ -379,92 +397,8 @@ include('../public/includes/header.php');
   </div>
 
 </section>
-<script>
 
-let focusMinutes = 25;
-let currentSeconds = focusMinutes * 60;
-
-let timer;
-let isRunning = false;
-
-const timerText = document.querySelector(
-    ".pomo-ring-text"
-);
-
-const startBtn = document.querySelector(
-    "[data-pomo-start]"
-);
-
-function updateTimerUI()
-{
-    let minutes = Math.floor(currentSeconds / 60);
-
-    let seconds = currentSeconds % 60;
-
-    timerText.innerText =
-        String(minutes).padStart(2, '0')
-        + ":" +
-        String(seconds).padStart(2, '0');
-}
-
-function startTimer()
-{
-    if (isRunning) return;
-
-    isRunning = true;
-
-    timer = setInterval(() => {
-
-        currentSeconds--;
-
-        updateTimerUI();
-
-        if (currentSeconds <= 0)
-        {
-            clearInterval(timer);
-
-            isRunning = false;
-
-            saveFocusSession();
-        }
-
-    }, 1000);
-}
-
-function saveFocusSession()
-{
-    fetch("index.php?page=save-focus-session", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
-
-        body: "minutes=" + focusMinutes
-    })
-    .then(res => res.json())
-    .then(data => {
-
-        if (data.success)
-        {
-            alert(
-                "Focus session completed!"
-            );
-
-            location.reload();
-        }
-
-    });
-}
-
-startBtn.addEventListener(
-    "click",
-    startTimer
-);
-
-updateTimerUI();
+    
 
 </script>
 <?php include('includes/footer.php'); ?>

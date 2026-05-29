@@ -27,13 +27,13 @@ include('../public/includes/header.php');
     <h2>Keep your list short and clear.</h2>
 
     <?php if ($taskSuccess): ?>
-      <p class="form-message success" style="margin-top:0.75rem;">
+      <p class="form-message success flash-message" style="margin-top:0.75rem;">
         <?php echo htmlspecialchars($taskSuccess); ?>
       </p>
     <?php endif; ?>
 
     <?php if ($taskError): ?>
-      <p class="form-message error" style="margin-top:0.75rem;">
+      <p class="form-message error flash-message" style="margin-top:0.75rem;">
         <?php echo htmlspecialchars($taskError); ?>
       </p>
     <?php endif; ?>
@@ -342,5 +342,26 @@ include('../public/includes/header.php');
 
 </section>
 
+<script>
+
+setTimeout(() => {
+
+    document.querySelectorAll(".flash-message")
+    .forEach(message => {
+
+        message.style.transition =
+            "opacity 0.5s ease";
+
+        message.style.opacity = "0";
+
+        setTimeout(() => {
+            message.remove();
+        }, 500);
+
+    });
+
+}, 2500);
+
+</script>
 
 <?php include('includes/footer.php'); ?>

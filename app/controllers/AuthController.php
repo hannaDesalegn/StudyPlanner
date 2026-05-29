@@ -214,36 +214,51 @@ $_SESSION['success'] = "Profile updated successfully!";
 header("Location: index.php?page=profile");
 exit();
 }
-// SAVE FOCUS SESSION
-public function saveFocusSession()
+
+public function updateGoals()
 {
     if (!isset($_SESSION['user_id'])) {
-        echo json_encode([
-            'success' => false
-        ]);
-
+        header("Location: index.php");
         exit();
     }
 
-    $minutes = (int) ($_POST['minutes'] ?? 0);
+    $user_id = $_SESSION['user_id'];
 
-    if ($minutes <= 0) {
-        echo json_encode([
-            'success' => false
-        ]);
+    $data = [
+        'daily_focus_hours' =>
+            (int) ($_POST['daily_focus_hours'] ?? 4),
 
-        exit();
+        'weekly_tasks_target' =>
+            (int) ($_POST['weekly_tasks_target'] ?? 14),
+
+        'target_completion' =>
+            (int) ($_POST['target_completion'] ?? 80)
+    ];
+
+    // validation
+    if ($data['daily_focus_hours'] < 1) {
+        $data['daily_focus_hours'] = 1;
     }
 
-    $this->userModel->saveFocusSession(
-        $_SESSION['user_id'],
-        $minutes
+    if ($data['weekly_tasks_target'] < 1) {
+        $data['weekly_tasks_target'] = 1;
+    }
+
+    if ($data['target_completion'] < 1 ||
+        $data['target_completion'] > 100) {
+
+        $data['target_completion'] = 80;
+    }
+
+    $this->userModel->updateStudyGoals(
+        $user_id,
+        $data
     );
 
-    echo json_encode([
-        'success' => true
-    ]);
+    $_SESSION['success'] =
+        "Study goals updated successfully.";
 
+    header("Location: index.php?page=profile");
     exit();
 }
 }

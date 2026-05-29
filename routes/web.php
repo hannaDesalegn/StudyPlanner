@@ -86,9 +86,10 @@ switch ($page) {
         $auth->authenticate();
         break;
 
-    case 'save-focus-session':
-        $auth->saveFocusSession();
-        break;
+    
+    case 'update-goals':
+    $auth->updateGoals();
+    break;
 
     case 'logout':
         $auth->logout();
