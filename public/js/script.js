@@ -148,13 +148,7 @@ function filterTasks() {
 taskSearch?.addEventListener('input', filterTasks);
 taskFilter?.addEventListener('change', filterTasks);
 
-// aalendar week/month toggle 
-document.querySelectorAll('.calendar-switcher .pill-btn').forEach(btn => {
-  btn.addEventListener('click', function () {
-    this.closest('.calendar-switcher').querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-  });
-});
+
 
 // animate stat counters
 function animateCounter(el) {

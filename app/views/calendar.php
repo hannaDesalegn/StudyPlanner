@@ -89,11 +89,6 @@ include('../public/includes/header.php');
     </a>
 
     <a class="pill-btn"
-       href="index.php?page=calendar&view=week">
-       Week
-    </a>
-
-    <a class="pill-btn"
        href="index.php?page=calendar&year=<?php echo $nextMonth->format('Y'); ?>&month=<?php echo $nextMonth->format('n'); ?>">
        Next
     </a>
